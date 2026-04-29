@@ -9,6 +9,9 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { existsSync } from "node:fs";
 
 dotenv.config();
 
@@ -17,6 +20,9 @@ const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || "ChatApp";
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = Number(process.env.PORT) || 5000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.join(__dirname, "dist");
 
 if (!MONGODB_URI) {
   throw new Error("MONGODB_URI is not set. Add it to your .env file.");
@@ -516,6 +522,13 @@ io.on("connection", (socket) => {
 // ============================================
 // START SERVER
 // ============================================
+if (existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get(/^(?!\/api).*/, (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+}
+
 httpServer.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
