@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 import '../styles/Auth.css';
 
 interface LoginProps {
@@ -20,7 +21,7 @@ export default function Login({ onLogin }: LoginProps) {
 
     try {
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-      const response = await axios.post(`http://localhost:5000${endpoint}`, {
+      const response = await axios.post(`${API_BASE_URL}${endpoint}`, {
         username,
         password
       });

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 import ChatList from '../components/ChatList';
 import ChatWindow from '../components/ChatWindow';
 import NewChatModal from '../components/NewChatModal';
@@ -34,7 +35,7 @@ export default function ChatDashboard({ user, onLogout }: DashboardProps) {
 
   const token = localStorage.getItem('token');
   const api = axios.create({
-    baseURL: 'http://localhost:5000',
+    baseURL: API_BASE_URL,
     headers: { Authorization: `Bearer ${token}` }
   });
 

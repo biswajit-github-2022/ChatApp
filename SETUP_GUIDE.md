@@ -12,26 +12,17 @@ npm install
 
 This will install all required packages including Express, MongoDB driver, React, Socket.io, etc.
 
-### Step 2: Update Server Configuration
+### Step 2: Configure Environment Variables
 
-Edit `server.js` line 17 and update the MongoDB connection string if needed:
-
-```javascript
-const uri = "mongodb+srv://ranabiswajit911:VXZ7D2T3vKN7i1rR@cluster0.iouiweb.mongodb.net/?appName=Cluster0";
-```
-
-**Important:** For production, move this to a `.env` file:
+Create a `.env` file from `.env.example` and fill your values:
 
 ```bash
-# Create .env file
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/
-JWT_SECRET=your-secret-key-here
-```
-
-Then update server.js to use:
-```javascript
-const uri = process.env.MONGODB_URI;
-const JWT_SECRET = process.env.JWT_SECRET;
+MONGODB_URI=your-mongodb-connection-string
+MONGODB_DB_NAME=ChatApp
+JWT_SECRET=replace-with-a-strong-secret
+PORT=5000
+FRONTEND_URL=http://localhost:5173
+VITE_API_BASE_URL=http://localhost:5000
 ```
 
 ### Step 3: Run the Application
@@ -54,7 +45,7 @@ npm run dev
 Backend: http://localhost:5000
 Frontend: http://localhost:5173
 
-**Option C: Run with Both in One Command**
+**Option C: Run Both in One Command**
 ```bash
 npm run dev:all
 ```
@@ -66,6 +57,44 @@ npm run dev:all
 2. Click "Sign up" 
 3. Create 2-3 test accounts with different usernames
 4. Try creating chats between them!
+
+---
+
+## 🌐 Deploy to Render
+
+This repo now includes `render.yaml` for blueprint deploy.
+
+### 1) Push to GitHub
+
+```bash
+git add .
+git commit -m "Prepare app for Render deployment"
+git push
+```
+
+### 2) In Render
+
+- Choose **New +** → **Blueprint**
+- Select your GitHub repo
+- Render will create:
+  - `chat-app-backend` (Node web service)
+  - `chat-app-frontend` (static site)
+
+### 3) Set production env vars in Render
+
+For backend service:
+- `MONGODB_URI`
+- `JWT_SECRET`
+- `MONGODB_DB_NAME` (default: `ChatApp`)
+- `FRONTEND_URL` (your frontend Render URL)
+
+For frontend service:
+- `VITE_API_BASE_URL` (your backend Render URL)
+
+### 4) Final check
+
+- Open frontend URL
+- Register/login should call backend URL (not localhost)
 
 ---
 
