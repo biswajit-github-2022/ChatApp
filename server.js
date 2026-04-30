@@ -1,3 +1,5 @@
+import dns from "node:dns/promises";
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -48,16 +50,24 @@ let db;
 
 // Connect to MongoDB
 async function connectDB() {
-  try {
-    await client.connect();
-    db = client.db(MONGODB_DB_NAME);
-    console.log("✅ Connected to MongoDB");
-  } catch (error) {
-    console.error("❌ MongoDB Connection Error:", error);
-  }
+  await client.connect();
+  db = client.db(MONGODB_DB_NAME);
+  console.log("✅ Connected to MongoDB");
 }
 
-connectDB();
+try {
+  await connectDB();
+} catch (error) {
+  console.error("❌ MongoDB Connection Error:", error);
+  process.exit(1);
+}
+
+app.use("/api", (req, res, next) => {
+  if (!db) {
+    return res.status(503).json({ error: "Database is not ready yet. Please retry." });
+  }
+  next();
+});
 
 // ============================================
 // AUTHENTICATION MIDDLEWARE
