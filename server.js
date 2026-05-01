@@ -14,32 +14,46 @@ import { existsSync } from "node:fs";
 
 dotenv.config();
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const FRONTEND_URL = process.env.FRONTEND_URL;
 const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME || "ChatApp";
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = Number(process.env.PORT) || 5000;
+const NODE_ENV = process.env.NODE_ENV || "development";
+const isProduction = NODE_ENV === "production";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const distPath = path.join(__dirname, "dist");
 
 if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI is not set. Add it to your .env file.");
+  throw new Error("MONGODB_URI is not set. Add it to your .env file or Render environment.");
 }
 
 if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET is not set. Add it to your .env file.");
+  throw new Error("JWT_SECRET is not set. Add it to your .env file or Render environment.");
 }
 
 const app = express();
 const httpServer = createServer(app);
+const corsOptions = isProduction
+  ? FRONTEND_URL
+    ? { origin: FRONTEND_URL, credentials: true }
+    : undefined
+  : { origin: true, credentials: true };
 const io = new Server(httpServer, {
-  cors: { origin: FRONTEND_URL, credentials: true }
+  cors: corsOptions
 });
 
 // Middleware
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+app.use(cors(corsOptions));
 app.use(express.json());
+
+if (isProduction && existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get(/^(?!\/api).*/, (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+}
 
 // MongoDB Connection
 const client = new MongoClient(MONGODB_URI, {
@@ -535,6 +549,15 @@ if (existsSync(distPath)) {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
+
+httpServer.on("error", (error) => {
+  if (error.code === "EADDRINUSE") {
+    console.error(`❌ Port ${PORT} is already in use. Change PORT or stop the process that is using it.`);
+    process.exit(1);
+  }
+  console.error("❌ Server error:", error);
+  process.exit(1);
+});
 
 httpServer.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
