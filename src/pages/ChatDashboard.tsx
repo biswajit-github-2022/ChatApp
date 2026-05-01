@@ -45,9 +45,10 @@ export default function ChatDashboard({ user, onLogout }: DashboardProps) {
         setLoading(true);
       }
       const response = await api.get('/api/chats');
-      setChats(response.data);
+      setChats(Array.isArray(response.data) ? response.data : []);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to load chats');
+      setChats([]);
     } finally {
       if (showLoader) {
         setLoading(false);

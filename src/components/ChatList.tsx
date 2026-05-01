@@ -22,6 +22,10 @@ export default function ChatList({
   onSelectChat,
   onRequestDeleteChat
 }: ChatListProps) {
+  if (!Array.isArray(chats)) {
+    return null;
+  }
+
   const formatTime = (date: Date) => {
     const msgDate = new Date(date);
     const today = new Date();

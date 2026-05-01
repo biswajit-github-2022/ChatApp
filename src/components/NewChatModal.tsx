@@ -42,9 +42,10 @@ export default function NewChatModal({
       const response = await api.get('/api/users/search', {
         params: { query }
       });
-      setSearchResults(response.data);
+      setSearchResults(Array.isArray(response.data) ? response.data : []);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Search failed');
+      setSearchResults([]);
     } finally {
       setLoading(false);
     }
@@ -153,7 +154,7 @@ export default function NewChatModal({
             <div className="hint">Type a username to search</div>
           ) : (
             <div className="user-list">
-              {searchResults.map((user) => (
+              {Array.isArray(searchResults) ? searchResults.map((user) => (
                 <button
                   key={user._id}
                   className="user-item"
@@ -169,7 +170,7 @@ export default function NewChatModal({
                         : '+'}
                   </span>
                 </button>
-              ))}
+              )) : null}
             </div>
           )}
 

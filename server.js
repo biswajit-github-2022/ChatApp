@@ -1,5 +1,3 @@
-import dns from "node:dns/promises";
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -11,6 +9,7 @@ import { Server } from "socket.io";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { existsSync } from "node:fs";
+import dns from "node:dns/promises";
 
 dotenv.config();
 
@@ -21,6 +20,15 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = Number(process.env.PORT) || 5000;
 const NODE_ENV = process.env.NODE_ENV || "development";
 const isProduction = NODE_ENV === "production";
+
+if (!isProduction) {
+  try {
+    dns.setServers(["8.8.8.8", "1.1.1.1"]);
+  } catch (dnsError) {
+    console.warn("⚠️ Unable to set custom DNS servers:", dnsError.message);
+  }
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const distPath = path.join(__dirname, "dist");
