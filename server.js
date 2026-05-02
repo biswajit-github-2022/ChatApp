@@ -23,7 +23,7 @@ const isProduction = NODE_ENV === "production";
 
 if (!isProduction) {
   try {
-    dns.setServers(["8.8.8.8", "1.1.1.1"]);
+    dns.setServers(["1.1.1.1", "8.8.8.8"]);
   } catch (dnsError) {
     console.warn("⚠️ Unable to set custom DNS servers:", dnsError.message);
   }
@@ -65,7 +65,10 @@ if (isProduction && existsSync(distPath)) {
 
 // MongoDB Connection
 const client = new MongoClient(MONGODB_URI, {
-  serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true }
+  serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
+  tls: true,
+  connectTimeoutMS: 10000,
+  serverSelectionTimeoutMS: 10000
 });
 
 let db;
