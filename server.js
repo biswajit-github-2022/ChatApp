@@ -483,21 +483,6 @@ app.post("/api/messages", authenticateToken, async (req, res) => {
       return res.status(404).json({ error: "Chat not found" });
     }
 
-    // In direct chats, a user must wait for the other participant to reply
-    // before sending another message.
-    if (chat.chatType === "direct") {
-      const lastMessage = await messages.findOne(
-        { chatId: chatObjectId },
-        { sort: { createdAt: -1 } }
-      );
-
-      if (lastMessage && lastMessage.senderId.toString() === senderId.toString()) {
-        return res.status(429).json({
-          error: "Wait for the other user to reply before sending another message."
-        });
-      }
-    }
-
     // Insert message
     const result = await messages.insertOne({
       chatId: chatObjectId,

@@ -162,8 +162,13 @@ export default function ChatWindow({ chat, user, api, onBack, onClose }: ChatWin
           type="submit"
           className="send-btn"
           disabled={sending || !newMessage.trim()}
+          aria-label="Send message"
         >
-          {sending ? '⏳' : '📤'}
+          {sending ? (
+            <span className="send-icon">⏳</span>
+          ) : (
+            <span className="send-icon">✈️</span>
+          )}
         </button>
       </form>
     </div>
